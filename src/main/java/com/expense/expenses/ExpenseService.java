@@ -2,11 +2,14 @@ package com.expense.expenses;
 
 import com.expense.expenses.dtos.ExpenseRequest;
 import com.expense.expenses.dtos.ExpenseResponse;
+import com.expense.expenses.enums.ExpenseType;
 import com.expense.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +32,18 @@ public class ExpenseService {
         return expenseRepository.findByUser(user, pageable)
                 .map(this::toResponse);
     }
+
+    public Page<ExpenseResponse> getFilteredExpenses(User user,
+                                                     ExpenseType type,
+                                                     LocalDate startDate,
+                                                     LocalDate endDate,
+                                                     Integer month,
+                                                     Integer year,
+                                                     Pageable pageable) {
+        return expenseRepository.findFiltered(user, type, startDate, endDate, month, year, pageable)
+                .map(this::toResponse);
+    }
+
 
     public ExpenseResponse getExpenseById(User user, Long id) {
         Expense expense1 = expenseRepository.findByIdAndUser(id, user)

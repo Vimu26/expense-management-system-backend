@@ -2,14 +2,18 @@ package com.expense.expenses;
 
 import com.expense.expenses.dtos.ExpenseRequest;
 import com.expense.expenses.dtos.ExpenseResponse;
+import com.expense.expenses.enums.ExpenseType;
 import com.expense.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
 
 @RestController
 @RequestMapping("/api/expenses")
@@ -33,6 +37,21 @@ public class ExpenseController {
             @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size);
         return ResponseEntity.ok(expenseService.getExpenses(getCurrentUser(), pageable));
+    }
+
+    @GetMapping("/filter")
+    public ResponseEntity<Page<ExpenseResponse>> getExpenses(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) ExpenseType type,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            @RequestParam(required = false) Integer month,
+            @RequestParam(required = false) Integer year
+    ){
+        Pageable pageable = PageRequest.of(page, size);
+        return ResponseEntity.ok(expenseService.getFilteredExpenses(
+                getCurrentUser(), type, startDate, endDate, month, year, pageable));
     }
 
     @GetMapping("/{id}")

@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -44,14 +45,14 @@ public class ExpenseController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) ExpenseType type,
+            @RequestParam(required = false) Integer user_id,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
             @RequestParam(required = false) Integer month,
             @RequestParam(required = false) Integer year
     ){
-        Pageable pageable = PageRequest.of(page, size);
-        return ResponseEntity.ok(expenseService.getFilteredExpenses(
-                getCurrentUser(), type, startDate, endDate, month, year, pageable));
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
+        return ResponseEntity.ok(expenseService.getFilteredExpenses(type,user_id, startDate, endDate, month, year, pageable));
     }
 
     @GetMapping("/{id}")

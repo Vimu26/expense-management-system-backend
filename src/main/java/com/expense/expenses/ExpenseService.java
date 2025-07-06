@@ -33,14 +33,14 @@ public class ExpenseService {
                 .map(this::toResponse);
     }
 
-    public Page<ExpenseResponse> getFilteredExpenses(User user,
-                                                     ExpenseType type,
+    public Page<ExpenseResponse> getFilteredExpenses(ExpenseType type,
+                                                     Integer user_id,
                                                      LocalDate startDate,
                                                      LocalDate endDate,
                                                      Integer month,
                                                      Integer year,
                                                      Pageable pageable) {
-        return expenseRepository.findFiltered(user, type, startDate, endDate, month, year, pageable)
+        return expenseRepository.findFiltered(type, user_id, startDate, endDate, month, year, pageable)
                 .map(this::toResponse);
     }
 
@@ -74,6 +74,12 @@ public class ExpenseService {
         res.setDescription(expense.getDescription());
         res.setDate(expense.getDate());
         res.setType(expense.getType());
+
+        if (expense.getUser() != null) {
+            res.setUserId(expense.getUser().getId());
+            res.setUserName(expense.getUser().getFirstName() + " " + expense.getUser().getLastName());
+        }
+
         return res;
     }
 }

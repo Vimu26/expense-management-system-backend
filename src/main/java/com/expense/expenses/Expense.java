@@ -34,6 +34,6 @@ public class Expense {
     private ExpenseType type;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id") // references User.id
     private User user;
 }

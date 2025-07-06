@@ -1,5 +1,7 @@
 package com.expense.expenses;
 
+import com.expense.expenseTypes.ExpenseTypes;
+import com.expense.expenseTypes.ExpenseTypesRepository;
 import com.expense.expenses.dtos.ExpenseRequest;
 import com.expense.expenses.dtos.ExpenseResponse;
 import com.expense.expenses.enums.ExpenseType;
@@ -15,13 +17,18 @@ import java.time.LocalDate;
 @RequiredArgsConstructor
 public class ExpenseService {
     private final ExpenseRepository expenseRepository;
+    private final ExpenseTypesRepository expenseTypesRepository;
+
 
     public ExpenseResponse createExpense(User user, ExpenseRequest request) {
+        ExpenseTypes type = expenseTypesRepository.findById(request.getType())
+                .orElseThrow(() -> new RuntimeException("Expense type not found"));
+
         Expense expense = Expense.builder()
                 .amount(request.getAmount())
                 .description(request.getDescription())
                 .date(request.getDate())
-                .type(request.getType())
+                .type(type)
                 .user(user)
                 .build();
         Expense saved = expenseRepository.save(expense);
@@ -33,14 +40,14 @@ public class ExpenseService {
                 .map(this::toResponse);
     }
 
-    public Page<ExpenseResponse> getFilteredExpenses(ExpenseType type,
+    public Page<ExpenseResponse> getFilteredExpenses(Long type_id,
                                                      Integer user_id,
                                                      LocalDate startDate,
                                                      LocalDate endDate,
                                                      Integer month,
                                                      Integer year,
                                                      Pageable pageable) {
-        return expenseRepository.findFiltered(type, user_id, startDate, endDate, month, year, pageable)
+        return expenseRepository.findFiltered(type_id, user_id, startDate, endDate, month, year, pageable)
                 .map(this::toResponse);
     }
 
@@ -53,10 +60,12 @@ public class ExpenseService {
 
     public ExpenseResponse updateExpense(User user,Long id, ExpenseRequest request) {
        Expense expenseData = expenseRepository.findById(id).orElseThrow(() -> new RuntimeException("Expense not found"));
+        ExpenseTypes type = expenseTypesRepository.findById(request.getType())
+                .orElseThrow(() -> new RuntimeException("Expense type not found"));
        expenseData.setAmount(request.getAmount());
        expenseData.setDescription(request.getDescription());
        expenseData.setDate(request.getDate());
-       expenseData.setType(request.getType());
+       expenseData.setType(type);
        expenseData.setUser(user);
 
        return toResponse(expenseRepository.save(expenseData));
@@ -73,7 +82,11 @@ public class ExpenseService {
         res.setAmount(expense.getAmount());
         res.setDescription(expense.getDescription());
         res.setDate(expense.getDate());
-        res.setType(expense.getType());
+
+        if (expense.getType() != null) {
+            res.setTypeId(expense.getType().getId());
+            res.setTypeName(expense.getType().getName());
+        }
 
         if (expense.getUser() != null) {
             res.setUserId(expense.getUser().getId());

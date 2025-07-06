@@ -15,5 +15,5 @@ public class ExpenseRequest {
     private BigDecimal amount;
     private String description;
     private LocalDate date;
-    private ExpenseType type;
+    private Long type;
 }

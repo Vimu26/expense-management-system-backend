@@ -14,7 +14,8 @@ public class ExpenseResponse {
     private BigDecimal amount;
     private String description;
     private LocalDate date;
-    private ExpenseType type;
+    private Long typeId;
+    private String typeName;
     private Long userId;
     private String userName;
 

@@ -1,5 +1,6 @@
 package com.expense.expenses;
 
+import com.expense.expenseTypes.ExpenseTypes;
 import com.expense.expenses.enums.ExpenseType;
 import com.expense.user.User;
 import jakarta.persistence.*;
@@ -30,8 +31,10 @@ public class Expense {
     @Column(nullable = false)
     private LocalDate date;
 
-    @Enumerated(EnumType.STRING)
-    private ExpenseType type;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "expense_type_id")
+    private ExpenseTypes type;
+
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id") // references User.id
